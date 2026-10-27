@@ -146,19 +146,18 @@ A plane-based experiment compares the ray-depth interval against a low-resolutio
 
 ### `depthPara/lathe`
 
-A lathe-scene experiment uses an orthographic camera with `len = 1.2`, a \(200 \times 100\) depth target, and a 50-step ray traversal. The code includes both the earlier point-sample test (commented out) and the newer interval/tolerance test (active). The screenshots below are captured console output from the two runs.
+A lathe-scene experiment uses an orthographic camera with `len = 1.2`, a \(200 \times 100\) depth target, and a 50-step ray traversal. The code includes both the earlier point-sample test (commented out) and the newer interval/tolerance test (active).
 
 ## Observed test result
 
-The supplied lathe screenshots show one test ray for which the earlier point-sample method did not report a hit within its 50-step traversal, while the interval-based method reported a hit on its third sample (zero-based iteration `i = 2`).
+The following images show the actual rendered lathe scene. The white line in each image visualizes the ray; these are rendered results, not console-output screenshots.
 
-| Run | Observed output | Evidence |
-| --- | --- | --- |
-| Earlier point-sample test | `flag = 3` after the 50-step loop; the screenshot's final sample is iteration 49 at pixel `(189, 58)`. | ![Earlier point-sample result](depthPara/lathe/截屏2025-09-24%2015.14.13.png) |
-| Interval and tolerance test | `flag = 1` at iteration 2, pixel `(189, 41)`. The stored pixel depth is `0.0004327812639530748`; the ray interval is `[0.00043277502096399697, 0.00043509104646426844]`, so the pixel depth lies inside the interval. | ![Interval-based hit result](depthPara/lathe/截屏2025-09-24%2015.14.49.png) |
-| Earlier trace samples | Shows sample depth values from the earlier traversal. | ![Earlier trace samples](depthPara/lathe/截屏2025-09-24%2015.14.02.png) |
+| Rendered result | Scene image |
+| --- | --- |
+| Ray visualization, October 8, 2025, 13:21:28 | ![Rendered lathe scene with the white ray visible in the upper-right area](resource/rendered-ray-13-21-28.png) |
+| Ray visualization, October 8, 2025, 13:22:58 | ![Rendered lathe scene with the white ray extending diagonally across the gear](resource/rendered-ray-13-22-58.png) |
 
-This is evidence that the revised test changes the outcome for the recorded ray in this scene. The supplied materials do not include ground-truth intersection labels, repeated-scene hit-rate measurements, frame-time measurements, or a controlled image-quality comparison. Therefore, no numeric accuracy improvement or performance speedup is claimed here.
+The images document the visible ray in the rendered scene. They are qualitative visualizations and, by themselves, do not establish which intersection test generated each image or provide ground-truth hit labels. The supplied materials do not include repeated-scene hit-rate measurements, frame-time measurements, or a controlled image-quality comparison; therefore, no numeric accuracy improvement or performance speedup is claimed here.
 
 ## Running the demos
 
@@ -186,4 +185,4 @@ Both projects also provide `npm start` and `npm run build` scripts. The lathe so
 - The chosen \(\theta_{\max}\) is embedded as a constant; the demos do not calculate it from scene geometry or select a camera per surface point.
 - The source code is experimental. Its pixel indexing and ray/rectangle boundary calculations are written for the tested camera/ray orientations; a reusable implementation should use signed slab intervals, handle near-zero direction components, reject out-of-range pixel coordinates, and consistently account for depth-buffer orientation and background pixels.
 - The interval and tolerance tests deliberately prefer avoiding false misses. They can introduce false-positive hits when the ray is close to, but does not actually intersect, a surface.
-- The screenshots demonstrate one recorded ray outcome, not a proof of correctness for arbitrary geometry, camera settings, or ray directions.
+- The rendered screenshots show the ray visualization in one scene, not a proof of correctness for arbitrary geometry, camera settings, or ray directions.
