@@ -22,7 +22,7 @@ The optimization treats the depth-buffer sample as representing a pixel cell. It
 
 Assume an orthographic view and a bound on the angle between the view direction and the visible surface normal. Under that assumption, the steepest relevant surface produces the greatest depth change across one pixel footprint.
 
-Let the orthographic view cover half-width \(h_x\) and half-height \(h_y\), and let the depth image have dimensions \(W \times H\). The view-space dimensions of a pixel are
+Let the orthographic view cover half-width $h_x$ and half-height $h_y$, and let the depth image have dimensions $W \times H$. The view-space dimensions of a pixel are
 
 $$
 \Delta x = \frac{2h_x}{W}, \qquad
@@ -70,7 +70,7 @@ const threshold =
   (camera.maxZ - camera.minZ);
 ```
 
-Reducing the depth-buffer resolution increases \(\Delta x\) and/or \(\Delta y\), which increases the tolerance. The derivation is conservative only under its assumptions: an orthographic projection and the stated bound on surface orientation. A larger tolerance can reduce missed hits, but may also classify a nearby, non-intersecting ray as a hit.
+Reducing the depth-buffer resolution increases $\Delta x$ and/or $\Delta y$, which increases the tolerance. The derivation is conservative only under its assumptions: an orthographic projection and the stated bound on surface orientation. A larger tolerance can reduce missed hits, but may also classify a nearby, non-intersecting ray as a hit.
 
 The patent description also discusses selecting, among multiple cameras, the view with the smallest angle to a surface normal. That camera-selection policy is a theoretical premise in the description; the included demos use a single orthographic camera and hard-code the limiting angle rather than implementing a multi-camera selection step.
 
@@ -80,13 +80,13 @@ The patent description also discusses selecting, among multiple cameras, the vie
 
 ## Ray depth over a pixel cell
 
-The method operates in view space. For a ray with origin \(\mathbf{o}\), direction \(\mathbf{d}\), and ray parameter \(t\),
+The method operates in view space. For a ray with origin $\mathbf{o}$, direction $\mathbf{d}$, and ray parameter $t$,
 
 $$
 \mathbf{p}(t) = \mathbf{o} + t\mathbf{d}.
 $$
 
-For an orthographic view, the pixel grid maps to axis-aligned rectangles in view-space \(x,y\). Given pixel \((i,j)\), its bounds are
+For an orthographic view, the pixel grid maps to axis-aligned rectangles in view-space $x,y$. Given pixel $(i,j)$, its bounds are
 
 $$
 L=-h_x+i\Delta x,\quad R=L+\Delta x,
@@ -112,14 +112,14 @@ t_{\mathrm{exit}}=
 \min(\max(t_{x0},t_{x1}),\max(t_{y0},t_{y1})).
 $$
 
-If \(t_{\mathrm{enter}}>t_{\mathrm{exit}}\), the ray does not cross that pixel rectangle. Otherwise, evaluate the ray at both parameters. Convert the resulting view-space depths to the same normalized convention as the depth texture, and order them:
+If $t_{\mathrm{enter}}>t_{\mathrm{exit}}$, the ray does not cross that pixel rectangle. Otherwise, evaluate the ray at both parameters. Convert the resulting view-space depths to the same normalized convention as the depth texture, and order them:
 
 $$
 d_{\min}=\min(d_{\mathrm{enter}},d_{\mathrm{exit}}),\qquad
 d_{\max}=\max(d_{\mathrm{enter}},d_{\mathrm{exit}}).
 $$
 
-Thus, \([d_{\min},d_{\max}]\) is the interval of ray depths while the ray crosses the pixel cell. The depth texture contributes a representative surface depth \(d_p\) for that cell.
+Thus, $[d_{\min},d_{\max}]$ is the interval of ray depths while the ray crosses the pixel cell. The depth texture contributes a representative surface depth $d_p$ for that cell.
 
 ![A ray crossing pixel cells and its entry/exit positions](resource/RayMarching.png)
 
@@ -129,24 +129,24 @@ Thus, \([d_{\min},d_{\max}]\) is the interval of ray depths while the ray crosse
 
 ## Hit classification
 
-For each stepped ray position, the implementation identifies a pixel, reads its depth \(d_p\), and computes the ray interval \([d_{\min},d_{\max}]\) through the pixel cell.
+For each stepped ray position, the implementation identifies a pixel, reads its depth $d_p$, and computes the ray interval $[d_{\min},d_{\max}]$ through the pixel cell.
 
 | Condition | Interpretation | Action |
 | --- | --- | --- |
-| \(d_{\min} \le d_p \le d_{\max}\) | The stored surface depth lies inside the ray's depth interval in this cell. | Accept as a hit. |
-| \(d_p < d_{\min}\) and \(d_{\min}-d_p < \tau\) | The surface is just outside the interval, but the gap is within the pixel-footprint bound. | Accept as a tolerant hit. |
-| \(d_{\max} < d_p\) | The ray interval is in front of the stored surface depth under the implementation's depth ordering. | Continue marching. |
+| $d_{\min} \le d_p \le d_{\max}$ | The stored surface depth lies inside the ray's depth interval in this cell. | Accept as a hit. |
+| $d_p < d_{\min}$ and $d_{\min}-d_p < \tau$ | The surface is just outside the interval, but the gap is within the pixel-footprint bound. | Accept as a tolerant hit. |
+| $d_{\max} < d_p$ | The ray interval is in front of the stored surface depth under the implementation's depth ordering. | Continue marching. |
 | No accepted hit before the step limit | The ray did not satisfy either hit condition during the tested traversal. | Return the demo's terminal status. |
 
 ## Included experiments
 
 ### `depthPara/plane`
 
-A plane-based experiment compares the ray-depth interval against a low-resolution depth texture. The active configuration creates a \(1024 \times 512\) depth target; a \(256 \times 128\) configuration is also present in the source as a commented experiment. The old point-sample comparison remains commented out, while the interval-based test is active.
+A plane-based experiment compares the ray-depth interval against a low-resolution depth texture. The active configuration creates a $1024 \times 512$ depth target; a $256 \times 128$ configuration is also present in the source as a commented experiment. The old point-sample comparison remains commented out, while the interval-based test is active.
 
 ### `depthPara/lathe`
 
-A lathe-scene experiment uses an orthographic camera with `len = 1.2`, a \(200 \times 100\) depth target, and a 50-step ray traversal. The code includes both the earlier point-sample test (commented out) and the newer interval/tolerance test (active).
+A lathe-scene experiment uses an orthographic camera with `len = 1.2`, a $200 \times 100$ depth target, and a 50-step ray traversal. The code includes both the earlier point-sample test (commented out) and the newer interval/tolerance test (active).
 
 ## Observed test result
 
@@ -182,7 +182,7 @@ Both projects also provide `npm start` and `npm run build` scripts. The lathe so
 ## Implementation notes and limitations
 
 - The derivation assumes an orthographic projection. Perspective projection requires accounting for the changing pixel footprint with depth.
-- The chosen \(\theta_{\max}\) is embedded as a constant; the demos do not calculate it from scene geometry or select a camera per surface point.
+- The chosen $\theta_{\max}$ is embedded as a constant; the demos do not calculate it from scene geometry or select a camera per surface point.
 - The source code is experimental. Its pixel indexing and ray/rectangle boundary calculations are written for the tested camera/ray orientations; a reusable implementation should use signed slab intervals, handle near-zero direction components, reject out-of-range pixel coordinates, and consistently account for depth-buffer orientation and background pixels.
 - The interval and tolerance tests deliberately prefer avoiding false misses. They can introduce false-positive hits when the ray is close to, but does not actually intersect, a surface.
 - The rendered screenshots show the ray visualization in one scene, not a proof of correctness for arbitrary geometry, camera settings, or ray directions.
